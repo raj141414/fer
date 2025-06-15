@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: aishwarya-xerox
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+      - key: NPM_VERSION
+        value: 8
+    staticPublishPath: ./dist

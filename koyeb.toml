@@ -1,0 +1,22 @@
+[app]
+name = "aishwarya-xerox"
+
+[services.web]
+name = "web"
+type = "web"
+instance_type = "nano"
+regions = ["fra"]
+ports = [4173]
+routes = [{ path = "/", port = 4173 }]
+
+[services.web.build]
+type = "buildpack"
+build_command = "npm install && npm run build"
+run_command = "npm run start"
+
+[services.web.env]
+NODE_ENV = "production"
+PORT = "4173"
+
+[services.web.health_check]
+http = { path = "/", port = 4173 }
