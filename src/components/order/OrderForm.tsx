@@ -471,25 +471,25 @@ const OrderForm = () => {
         <Card className="border-green-200 bg-green-50">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
-              <CheckCircle className="h-16 w-16 text-green-500" />
+              <CheckCircle className="h-12 sm:h-16 w-12 sm:w-16 text-green-500" />
             </div>
-            <CardTitle className="text-2xl text-green-800">Order Submitted Successfully!</CardTitle>
+            <CardTitle className="text-xl sm:text-2xl text-green-800">Order Submitted Successfully!</CardTitle>
             <CardDescription className="text-green-700">
               Your print job has been received and will be processed soon.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="bg-white p-6 rounded-lg border border-green-200">
-              <h3 className="font-semibold text-lg text-gray-800 mb-3 text-center">Your Order ID</h3>
-              <div className="flex items-center justify-center gap-3 p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-                <span className="text-2xl font-mono font-bold text-xerox-700 select-all">
+            <div className="bg-white p-4 sm:p-6 rounded-lg border border-green-200">
+              <h3 className="font-semibold text-base sm:text-lg text-gray-800 mb-3 text-center">Your Order ID</h3>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                <span className="text-lg sm:text-2xl font-mono font-bold text-xerox-700 select-all break-all text-center">
                   {submittedOrderId}
                 </span>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={copyOrderId}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 w-full sm:w-auto"
                 >
                   <Copy className="h-4 w-4" />
                   Copy
@@ -501,12 +501,12 @@ const OrderForm = () => {
             </div>
 
             {/* Admin Contact Message */}
-            <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
+            <div className="bg-blue-50 p-4 sm:p-6 rounded-lg border border-blue-200">
               <div className="flex items-center justify-center gap-3 mb-4">
-                <Clock className="h-6 w-6 text-blue-600" />
-                <h4 className="font-semibold text-blue-900 text-lg">Quick Response Guarantee</h4>
+                <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
+                <h4 className="font-semibold text-blue-900 text-base sm:text-lg">Quick Response Guarantee</h4>
               </div>
-              <p className="text-blue-800 text-center text-lg font-medium">
+              <p className="text-blue-800 text-center text-base sm:text-lg font-medium">
                 Our Admin Will Contact You Within 10 Minutes
               </p>
               <p className="text-blue-700 text-center text-sm mt-2">
@@ -527,17 +527,17 @@ const OrderForm = () => {
               <h4 className="font-medium text-gray-800 mb-3">Contact Information</h4>
               <div className="space-y-2 text-sm text-gray-600">
                 <div className="flex items-center gap-2">
-                  <Phone className="h-4 w-4" />
-                  <span>6301526803</span>
+                  <Phone className="h-4 w-4 flex-shrink-0" />
+                  <span>+91 6301526803</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4" />
-                  <span>aishwaryaxerox1999@gmail.com</span>
+                  <Mail className="h-4 w-4 flex-shrink-0" />
+                  <span className="break-all">aishwaryaxerox1999@gmail.com</span>
                 </div>
               </div>
             </div>
 
-            <div className="flex gap-3 pt-4">
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
               <Button 
                 onClick={startNewOrder}
                 className="flex-1 bg-xerox-600 hover:bg-xerox-700"
@@ -585,7 +585,7 @@ const OrderForm = () => {
                   <FormItem>
                     <FormLabel>Phone Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="123-456-7890" {...field} />
+                      <Input placeholder="+91 9876543210" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -862,9 +862,9 @@ const OrderForm = () => {
                 <div className="space-y-3">
                   {files.map((file, index) => (
                     <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                      <FileText className="h-5 w-5 text-xerox-600" />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">{file.name}</p>
+                      <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-xerox-600 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{file.name}</p>
                         <p className="text-xs text-gray-500">
                           {(file.size / 1024 / 1024).toFixed(2)} MB • {file.type}
                         </p>
@@ -885,7 +885,7 @@ const OrderForm = () => {
                     <Calculator className="h-5 w-5 text-xerox-600" />
                     <h3 className="font-medium text-xerox-900">Estimated Cost</h3>
                   </div>
-                  <p className="text-2xl font-bold text-xerox-700">
+                  <p className="text-xl sm:text-2xl font-bold text-xerox-700">
                     ₹{calculatedCost.toFixed(2)}
                   </p>
                 </div>
@@ -928,7 +928,7 @@ const OrderForm = () => {
                     <Calculator className="h-5 w-5 text-blue-600" />
                     <h3 className="font-medium text-blue-900">Custom Print Order</h3>
                   </div>
-                  <p className="text-xl font-bold text-blue-700">
+                  <p className="text-lg sm:text-xl font-bold text-blue-700">
                     Quote Required
                   </p>
                 </div>

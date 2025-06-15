@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageLayout from '@/components/layout/PageLayout';
@@ -73,36 +72,36 @@ const Admin = () => {
 
   return (
     <PageLayout>
-      <div className="py-12">
+      <div className="py-6 sm:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-10">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-10 gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-              <p className="mt-2 text-gray-600">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+              <p className="mt-2 text-gray-600 text-sm sm:text-base">
                 Manage orders and settings
               </p>
             </div>
             <Button 
               variant="outline" 
               onClick={handleLogout} 
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 w-full sm:w-auto"
             >
               <LogOut className="h-4 w-4" /> Logout
             </Button>
           </div>
           
           <Tabs defaultValue="orders" value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="mb-8">
-              <TabsTrigger value="orders">Orders</TabsTrigger>
-              <TabsTrigger value="settings">Settings</TabsTrigger>
-              <TabsTrigger value="files">Files</TabsTrigger>
+            <TabsList className="mb-6 sm:mb-8 w-full sm:w-auto">
+              <TabsTrigger value="orders" className="text-xs sm:text-sm">Orders</TabsTrigger>
+              <TabsTrigger value="settings" className="text-xs sm:text-sm">Settings</TabsTrigger>
+              <TabsTrigger value="files" className="text-xs sm:text-sm">Files</TabsTrigger>
             </TabsList>
-            <TabsContent value="orders" className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold">All Orders</h2>
+            <TabsContent value="orders" className="bg-white p-4 sm:p-6 rounded-lg shadow-md border border-gray-100">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-4">
+                <h2 className="text-lg sm:text-xl font-semibold">All Orders</h2>
                 <Button 
                   variant="outline" 
-                  className="flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50"
+                  className="flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50 w-full sm:w-auto text-sm"
                   onClick={() => setShowClearOrdersDialog(true)}
                 >
                   <Trash2 className="h-4 w-4" /> Clear All Orders
@@ -110,35 +109,35 @@ const Admin = () => {
               </div>
               <OrdersList />
             </TabsContent>
-            <TabsContent value="settings" className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
-              <h2 className="text-xl font-semibold mb-6">Settings</h2>
+            <TabsContent value="settings" className="bg-white p-4 sm:p-6 rounded-lg shadow-md border border-gray-100">
+              <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">Settings</h2>
               <div className="space-y-4">
                 <div className="p-4 bg-gray-50 rounded-md">
-                  <h3 className="font-medium text-gray-700">File Storage</h3>
-                  <p className="mt-1 text-gray-600">Customer files are stored in the /uploads folder in the project. 
+                  <h3 className="font-medium text-gray-700 text-sm sm:text-base">File Storage</h3>
+                  <p className="mt-1 text-gray-600 text-sm">Customer files are stored in the /uploads folder in the project. 
                   In a production environment, you would implement server storage or cloud storage solutions for better persistence.</p>
                 </div>
                 <div className="p-4 bg-gray-50 rounded-md">
-                  <h3 className="font-medium text-gray-700">Admin Credentials</h3>
-                  <p className="mt-1 text-gray-600">Username: admin | Password: xerox123</p>
-                  <p className="text-sm text-gray-500 mt-1">This is for demonstration purposes only. In a real app, you would use secure credential storage.</p>
+                  <h3 className="font-medium text-gray-700 text-sm sm:text-base">Admin Credentials</h3>
+                  <p className="mt-1 text-gray-600 text-sm">Username: admin | Password: xerox123</p>
+                  <p className="text-xs text-gray-500 mt-1">This is for demonstration purposes only. In a real app, you would use secure credential storage.</p>
                 </div>
               </div>
             </TabsContent>
-            <TabsContent value="files" className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold">All Uploaded Files</h2>
-                <div className="flex gap-2">
+            <TabsContent value="files" className="bg-white p-4 sm:p-6 rounded-lg shadow-md border border-gray-100">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-4">
+                <h2 className="text-lg sm:text-xl font-semibold">All Uploaded Files</h2>
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                   <Button 
                     variant="outline" 
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 text-sm"
                     onClick={downloadAllFiles}
                   >
                     <Download className="h-4 w-4" /> Download All
                   </Button>
                   <Button 
                     variant="outline" 
-                    className="flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50"
+                    className="flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50 text-sm"
                     onClick={() => setShowClearFilesDialog(true)}
                   >
                     <Trash2 className="h-4 w-4" /> Clear All Files
@@ -153,16 +152,16 @@ const Admin = () => {
 
       {/* Alert Dialog for clearing files */}
       <AlertDialog open={showClearFilesDialog} onOpenChange={setShowClearFilesDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="mx-4">
           <AlertDialogHeader>
             <AlertDialogTitle>Clear All Files</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to clear all uploaded files? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={clearAllFiles} className="bg-red-600 hover:bg-red-700">
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+            <AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={clearAllFiles} className="bg-red-600 hover:bg-red-700 w-full sm:w-auto">
               Yes, Clear All Files
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -171,16 +170,16 @@ const Admin = () => {
 
       {/* Alert Dialog for clearing orders */}
       <AlertDialog open={showClearOrdersDialog} onOpenChange={setShowClearOrdersDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="mx-4">
           <AlertDialogHeader>
             <AlertDialogTitle>Clear All Orders</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to clear all orders? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={clearAllOrders} className="bg-red-600 hover:bg-red-700">
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+            <AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={clearAllOrders} className="bg-red-600 hover:bg-red-700 w-full sm:w-auto">
               Yes, Clear All Orders
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -236,11 +235,11 @@ const FilesManager = () => {
       ) : (
         <div className="space-y-2">
           {files.map((file, index) => (
-            <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
-              <div className="flex items-center">
-                <FileText className="h-5 w-5 text-xerox-600 mr-3" />
-                <div>
-                  <p className="text-sm font-medium">{file.name}</p>
+            <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 bg-gray-50 rounded-md gap-3">
+              <div className="flex items-center min-w-0 flex-1">
+                <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-xerox-600 mr-2 sm:mr-3 flex-shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium truncate">{file.name}</p>
                   <p className="text-xs text-gray-500">
                     {(file.size / 1024).toFixed(2)} KB • {file.path}
                   </p>
@@ -249,10 +248,10 @@ const FilesManager = () => {
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="flex items-center gap-1"
+                className="flex items-center gap-1 w-full sm:w-auto text-xs"
                 onClick={() => handleFileDownload(file)}
               >
-                <Download className="h-4 w-4" />
+                <Download className="h-3 w-3 sm:h-4 sm:w-4" />
                 Download
               </Button>
             </div>

@@ -3,7 +3,7 @@ import PageLayout from '@/components/layout/PageLayout';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, Package, Clock, CheckCircle, Truck } from "lucide-react";
+import { Search, Package, Clock, CheckCircle, Phone, Mail, MapPin } from "lucide-react";
 import { toast } from "sonner";
 
 interface Order {
@@ -115,18 +115,18 @@ const TrackOrder = () => {
 
   return (
     <PageLayout>
-      <div className="py-12 bg-gray-50">
+      <div className="py-8 sm:py-12 bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10">
-            <h1 className="text-3xl font-bold text-gray-900">Track Your Order</h1>
-            <p className="mt-4 text-xl text-gray-600">
+          <div className="text-center mb-8 sm:mb-10">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Track Your Order</h1>
+            <p className="mt-4 text-lg sm:text-xl text-gray-600">
               Enter your order ID to check the status of your print job
             </p>
           </div>
           
-          <Card className="mb-8">
+          <Card className="mb-6 sm:mb-8">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
                 <Search className="h-5 w-5" />
                 Order Lookup
               </CardTitle>
@@ -135,7 +135,7 @@ const TrackOrder = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <Input
                   placeholder="Enter Order ID (e.g., ORD-1234567890)"
                   value={orderId}
@@ -146,7 +146,7 @@ const TrackOrder = () => {
                 <Button 
                   onClick={handleTrackOrder} 
                   disabled={loading}
-                  className="bg-xerox-600 hover:bg-xerox-700"
+                  className="bg-xerox-600 hover:bg-xerox-700 w-full sm:w-auto"
                 >
                   {loading ? 'Searching...' : 'Track Order'}
                 </Button>
@@ -160,9 +160,9 @@ const TrackOrder = () => {
                 <div className="text-center">
                   <Package className="h-12 w-12 text-red-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-red-800 mb-2">Order Not Found</h3>
-                  <p className="text-red-600">
+                  <p className="text-red-600 text-sm sm:text-base">
                     Please check your order ID and try again. If you continue to have issues, 
-                    please contact us at 6301526803.
+                    please contact us at +91 6301526803.
                   </p>
                 </div>
               </CardContent>
@@ -173,16 +173,16 @@ const TrackOrder = () => {
             <div className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
                     {getStatusIcon(order.status)}
                     Order Status: {getStatusText(order.status)}
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="break-all">
                     Order ID: {order.orderId}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div>
                       <h4 className="font-medium text-gray-900 mb-3">Customer Details</h4>
                       <div className="space-y-2 text-sm">
@@ -251,8 +251,8 @@ const TrackOrder = () => {
                   <div className="space-y-2">
                     {order.files.map((file, index) => (
                       <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
-                        <div>
-                          <p className="text-sm font-medium">{file.name}</p>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium truncate">{file.name}</p>
                           <p className="text-xs text-gray-500">
                             {(file.size / 1024).toFixed(2)} KB
                           </p>
@@ -266,13 +266,33 @@ const TrackOrder = () => {
               <Card className="bg-blue-50 border-blue-200">
                 <CardContent className="pt-6">
                   <div className="text-center">
-                    <h4 className="font-medium text-blue-900 mb-2">Need Help?</h4>
-                    <p className="text-sm text-blue-700">
+                    <h4 className="font-medium text-blue-900 mb-4">Need Help?</h4>
+                    <p className="text-sm text-blue-700 mb-4">
                       If you have any questions about your order, please contact us:
                     </p>
-                    <div className="mt-3 space-y-1 text-sm text-blue-700">
-                      <p>Phone: 6301526803</p>
-                      <p>Email: aishwaryaxerox1999@gmail.com</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-blue-700">
+                      <div className="flex items-center justify-center gap-2">
+                        <MapPin className="h-4 w-4 flex-shrink-0" />
+                        <div className="text-center">
+                          <p className="font-medium">Address</p>
+                          <p>ADB road near pragati engineering college</p>
+                          <p>ramesampeta, surampalem</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-center gap-2">
+                        <Phone className="h-4 w-4 flex-shrink-0" />
+                        <div>
+                          <p className="font-medium">Phone</p>
+                          <p>+91 6301526803</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-center gap-2">
+                        <Mail className="h-4 w-4 flex-shrink-0" />
+                        <div>
+                          <p className="font-medium">Email</p>
+                          <p className="break-all">aishwaryaxerox1999@gmail.com</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </CardContent>

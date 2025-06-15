@@ -257,25 +257,25 @@ const OrdersList = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Order ID</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Print Type</TableHead>
-                  <TableHead>Copies</TableHead>
-                  <TableHead>Cost</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead className="min-w-[120px]">Order ID</TableHead>
+                  <TableHead className="min-w-[120px]">Customer</TableHead>
+                  <TableHead className="min-w-[140px]">Date</TableHead>
+                  <TableHead className="min-w-[120px]">Print Type</TableHead>
+                  <TableHead className="min-w-[80px]">Copies</TableHead>
+                  <TableHead className="min-w-[80px]">Cost</TableHead>
+                  <TableHead className="min-w-[100px]">Status</TableHead>
+                  <TableHead className="min-w-[120px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {currentOrders.map((order) => (
                   <TableRow key={order.orderId}>
-                    <TableCell>{order.orderId}</TableCell>
+                    <TableCell className="font-mono text-xs">{order.orderId}</TableCell>
                     <TableCell>{order.fullName}</TableCell>
-                    <TableCell>{formatDate(order.orderDate)}</TableCell>
-                    <TableCell>{getPrintTypeName(order.printType)}</TableCell>
+                    <TableCell className="text-xs">{formatDate(order.orderDate)}</TableCell>
+                    <TableCell className="text-xs">{getPrintTypeName(order.printType)}</TableCell>
                     <TableCell>{order.copies || 'N/A'}</TableCell>
-                    <TableCell>
+                    <TableCell className="text-xs">
                       {order.printType === 'customPrint' ? 'Quote Required' : `₹${order.totalCost?.toFixed(2) || '0.00'}`}
                     </TableCell>
                     <TableCell>{getStatusBadge(order.status)}</TableCell>
@@ -284,7 +284,7 @@ const OrdersList = () => {
                         variant="outline" 
                         size="sm"
                         onClick={() => viewOrderDetails(order)}
-                        className="mr-2"
+                        className="text-xs"
                       >
                         View Details
                       </Button>
@@ -297,7 +297,7 @@ const OrdersList = () => {
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between mt-6">
+            <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-4">
               <div className="text-sm text-gray-500">
                 Showing {startIndex + 1} to {Math.min(endIndex, orders.length)} of {orders.length} orders
               </div>
@@ -310,21 +310,34 @@ const OrdersList = () => {
                   className="flex items-center gap-1"
                 >
                   <ChevronLeft className="h-4 w-4" />
-                  Previous
+                  <span className="hidden sm:inline">Previous</span>
                 </Button>
                 
                 <div className="flex items-center space-x-1">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <Button
-                      key={page}
-                      variant={currentPage === page ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => goToPage(page)}
-                      className="w-8 h-8 p-0"
-                    >
-                      {page}
-                    </Button>
-                  ))}
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let page;
+                    if (totalPages <= 5) {
+                      page = i + 1;
+                    } else if (currentPage <= 3) {
+                      page = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      page = totalPages - 4 + i;
+                    } else {
+                      page = currentPage - 2 + i;
+                    }
+                    
+                    return (
+                      <Button
+                        key={page}
+                        variant={currentPage === page ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => goToPage(page)}
+                        className="w-8 h-8 p-0"
+                      >
+                        {page}
+                      </Button>
+                    );
+                  })}
                 </div>
 
                 <Button
@@ -334,7 +347,7 @@ const OrdersList = () => {
                   disabled={currentPage === totalPages}
                   className="flex items-center gap-1"
                 >
-                  Next
+                  <span className="hidden sm:inline">Next</span>
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
@@ -347,37 +360,37 @@ const OrdersList = () => {
         {selectedOrder && (
           <DialogContent className="max-w-4xl h-[90vh] overflow-hidden flex flex-col">
             <DialogHeader className="flex-shrink-0">
-              <DialogTitle>Order Details - {selectedOrder.orderId}</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-lg sm:text-xl">Order Details - {selectedOrder.orderId}</DialogTitle>
+              <DialogDescription className="text-sm">
                 Submitted on {formatDate(selectedOrder.orderDate)}
               </DialogDescription>
             </DialogHeader>
             
-            <div className="flex flex-1 gap-4 min-h-0">
+            <div className="flex flex-1 gap-2 sm:gap-4 min-h-0">
               {/* Main content area */}
               <div className="flex-1 min-w-0">
                 <ScrollArea 
-                  className="h-full pr-4"
+                  className="h-full pr-2 sm:pr-4"
                   data-scroll-container
                   onScroll={handleScroll}
                 >
                   <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                       <div>
-                        <h3 className="font-medium text-gray-700">Customer Information</h3>
-                        <div className="mt-2 space-y-1">
+                        <h3 className="font-medium text-gray-700 text-sm sm:text-base">Customer Information</h3>
+                        <div className="mt-2 space-y-1 text-sm">
                           <p><span className="font-medium">Name:</span> {selectedOrder.fullName}</p>
                           <p><span className="font-medium">Phone:</span> {selectedOrder.phoneNumber}</p>
                         </div>
                       </div>
                       
                       <div>
-                        <h3 className="font-medium text-gray-700">Order Status</h3>
-                        <div className="mt-2 flex flex-wrap gap-2">
+                        <h3 className="font-medium text-gray-700 text-sm sm:text-base">Order Status</h3>
+                        <div className="mt-2 flex flex-wrap gap-1 sm:gap-2">
                           <Button 
                             size="sm" 
                             variant={selectedOrder.status === 'pending' ? 'default' : 'outline'}
-                            className={selectedOrder.status === 'pending' ? 'bg-yellow-500 hover:bg-yellow-600' : ''}
+                            className={`text-xs ${selectedOrder.status === 'pending' ? 'bg-yellow-500 hover:bg-yellow-600' : ''}`}
                             onClick={() => handleStatusChange(selectedOrder.orderId, 'pending')}
                           >
                             Pending
@@ -385,7 +398,7 @@ const OrdersList = () => {
                           <Button 
                             size="sm" 
                             variant={selectedOrder.status === 'processing' ? 'default' : 'outline'}
-                            className={selectedOrder.status === 'processing' ? 'bg-blue-500 hover:bg-blue-600' : ''}
+                            className={`text-xs ${selectedOrder.status === 'processing' ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
                             onClick={() => handleStatusChange(selectedOrder.orderId, 'processing')}
                           >
                             Processing
@@ -393,7 +406,7 @@ const OrdersList = () => {
                           <Button 
                             size="sm" 
                             variant={selectedOrder.status === 'completed' ? 'default' : 'outline'}
-                            className={selectedOrder.status === 'completed' ? 'bg-green-500 hover:bg-green-600' : ''}
+                            className={`text-xs ${selectedOrder.status === 'completed' ? 'bg-green-500 hover:bg-green-600' : ''}`}
                             onClick={() => handleStatusChange(selectedOrder.orderId, 'completed')}
                           >
                             Completed
@@ -401,7 +414,7 @@ const OrdersList = () => {
                           <Button 
                             size="sm" 
                             variant={selectedOrder.status === 'cancelled' ? 'default' : 'outline'}
-                            className={selectedOrder.status === 'cancelled' ? 'bg-red-500 hover:bg-red-600' : ''}
+                            className={`text-xs ${selectedOrder.status === 'cancelled' ? 'bg-red-500 hover:bg-red-600' : ''}`}
                             onClick={() => handleStatusChange(selectedOrder.orderId, 'cancelled')}
                           >
                             Cancelled
@@ -411,61 +424,61 @@ const OrdersList = () => {
                     </div>
                     
                     <div className="border-t pt-4">
-                      <h3 className="font-medium text-gray-700">Print Details</h3>
-                      <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <h3 className="font-medium text-gray-700 text-sm sm:text-base">Print Details</h3>
+                      <div className="mt-2 grid grid-cols-1 lg:grid-cols-2 gap-4">
                         <div>
-                          <p className="text-sm text-gray-500">Print Type</p>
-                          <p>{getPrintTypeName(selectedOrder.printType)}</p>
+                          <p className="text-xs sm:text-sm text-gray-500">Print Type</p>
+                          <p className="text-sm">{getPrintTypeName(selectedOrder.printType)}</p>
                           
                           {/* Show binding color type for binding orders */}
                           {(selectedOrder.printType === 'softBinding' || selectedOrder.printType === 'spiralBinding') && selectedOrder.bindingColorType && (
                             <>
-                              <p className="mt-2 text-sm text-gray-500">Binding Color Type</p>
-                              <p>{getBindingColorTypeName(selectedOrder.bindingColorType)}</p>
+                              <p className="mt-2 text-xs sm:text-sm text-gray-500">Binding Color Type</p>
+                              <p className="text-sm">{getBindingColorTypeName(selectedOrder.bindingColorType)}</p>
                             </>
                           )}
                           
                           {/* Show custom print details */}
                           {selectedOrder.printType === 'custom' && (
                             <>
-                              <p className="mt-2 text-sm text-gray-500">Color Pages</p>
-                              <p>{selectedOrder.colorPages || 'None'}</p>
-                              <p className="mt-2 text-sm text-gray-500">B&W Pages</p>
-                              <p>{selectedOrder.bwPages || 'None'}</p>
+                              <p className="mt-2 text-xs sm:text-sm text-gray-500">Color Pages</p>
+                              <p className="text-sm">{selectedOrder.colorPages || 'None'}</p>
+                              <p className="mt-2 text-xs sm:text-sm text-gray-500">B&W Pages</p>
+                              <p className="text-sm">{selectedOrder.bwPages || 'None'}</p>
                             </>
                           )}
                           
                           {/* Show binding custom details */}
                           {(selectedOrder.printType === 'softBinding' || selectedOrder.printType === 'spiralBinding') && selectedOrder.bindingColorType === 'custom' && (
                             <>
-                              <p className="mt-2 text-sm text-gray-500">Color Pages (Binding)</p>
-                              <p>{selectedOrder.colorPages || 'None'}</p>
-                              <p className="mt-2 text-sm text-gray-500">B&W Pages (Binding)</p>
-                              <p>{selectedOrder.bwPages || 'None'}</p>
+                              <p className="mt-2 text-xs sm:text-sm text-gray-500">Color Pages (Binding)</p>
+                              <p className="text-sm">{selectedOrder.colorPages || 'None'}</p>
+                              <p className="mt-2 text-xs sm:text-sm text-gray-500">B&W Pages (Binding)</p>
+                              <p className="text-sm">{selectedOrder.bwPages || 'None'}</p>
                             </>
                           )}
                           
                           {/* Show selected pages for non-custom orders */}
                           {selectedOrder.printType !== 'custom' && selectedOrder.printType !== 'customPrint' && selectedOrder.selectedPages && (
                             <>
-                              <p className="mt-2 text-sm text-gray-500">Selected Pages</p>
-                              <p>{selectedOrder.selectedPages}</p>
+                              <p className="mt-2 text-xs sm:text-sm text-gray-500">Selected Pages</p>
+                              <p className="text-sm">{selectedOrder.selectedPages}</p>
                             </>
                           )}
                         </div>
                         <div>
                           {selectedOrder.printType !== 'customPrint' && (
                             <>
-                              <p className="text-sm text-gray-500">Print Side</p>
-                              <p>{selectedOrder.printSide === 'double' ? 'Double Sided' : 'Single Sided'}</p>
-                              <p className="mt-2 text-sm text-gray-500">Paper Size</p>
-                              <p>{getPaperSizeName(selectedOrder.paperSize)}</p>
-                              <p className="mt-2 text-sm text-gray-500">Copies</p>
-                              <p>{selectedOrder.copies}</p>
+                              <p className="text-xs sm:text-sm text-gray-500">Print Side</p>
+                              <p className="text-sm">{selectedOrder.printSide === 'double' ? 'Double Sided' : 'Single Sided'}</p>
+                              <p className="mt-2 text-xs sm:text-sm text-gray-500">Paper Size</p>
+                              <p className="text-sm">{getPaperSizeName(selectedOrder.paperSize)}</p>
+                              <p className="mt-2 text-xs sm:text-sm text-gray-500">Copies</p>
+                              <p className="text-sm">{selectedOrder.copies}</p>
                             </>
                           )}
-                          <p className="mt-2 text-sm text-gray-500">Total Cost</p>
-                          <p className="font-semibold">
+                          <p className="mt-2 text-xs sm:text-sm text-gray-500">Total Cost</p>
+                          <p className="font-semibold text-sm">
                             {selectedOrder.printType === 'customPrint' ? 'Quote Required' : `₹${selectedOrder.totalCost?.toFixed(2) || '0.00'}`}
                           </p>
                         </div>
@@ -474,20 +487,20 @@ const OrdersList = () => {
                     
                     {selectedOrder.specialInstructions && (
                       <div className="border-t pt-4">
-                        <h3 className="font-medium text-gray-700">Special Instructions</h3>
-                        <p className="mt-2 text-gray-800 whitespace-pre-line">{selectedOrder.specialInstructions}</p>
+                        <h3 className="font-medium text-gray-700 text-sm sm:text-base">Special Instructions</h3>
+                        <p className="mt-2 text-gray-800 whitespace-pre-line text-sm">{selectedOrder.specialInstructions}</p>
                       </div>
                     )}
                     
                     <div className="border-t pt-4">
-                      <h3 className="font-medium text-gray-700">Files ({selectedOrder.files.length})</h3>
+                      <h3 className="font-medium text-gray-700 text-sm sm:text-base">Files ({selectedOrder.files.length})</h3>
                       <div className="mt-2 space-y-2">
                         {selectedOrder.files.map((file, index) => (
-                          <div key={index} className="file-item flex justify-between items-center">
-                            <div className="flex items-center">
-                              <FileText className="h-5 w-5 text-xerox-600 mr-3" />
-                              <div>
-                                <p className="text-sm font-medium truncate max-w-xs">{file.name}</p>
+                          <div key={index} className="file-item flex justify-between items-center p-2 sm:p-3">
+                            <div className="flex items-center min-w-0 flex-1">
+                              <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-xerox-600 mr-2 sm:mr-3 flex-shrink-0" />
+                              <div className="min-w-0 flex-1">
+                                <p className="text-xs sm:text-sm font-medium truncate">{file.name}</p>
                                 <p className="text-xs text-gray-500">
                                   {(file.size / 1024).toFixed(2)} KB
                                 </p>
@@ -496,11 +509,11 @@ const OrdersList = () => {
                             <Button 
                               variant="outline"
                               size="sm"
-                              className="ml-2 text-blue-600"
+                              className="ml-2 text-blue-600 text-xs flex-shrink-0"
                               onClick={() => handleFileDownload(file)}
                             >
-                              <Download className="h-4 w-4 mr-1" />
-                              Download
+                              <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                              <span className="hidden sm:inline">Download</span>
                             </Button>
                           </div>
                         ))}
@@ -510,9 +523,9 @@ const OrdersList = () => {
                 </ScrollArea>
               </div>
               
-              {/* Scroll bar */}
+              {/* Scroll bar - only show on larger screens */}
               {maxScrollPosition > 0 && (
-                <div className="flex flex-col items-center justify-center w-8 bg-gray-50 rounded-lg p-2">
+                <div className="hidden sm:flex flex-col items-center justify-center w-8 bg-gray-50 rounded-lg p-2">
                   <Button
                     variant="ghost"
                     size="sm"
