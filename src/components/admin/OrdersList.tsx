@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { fileStorage } from '@/services/fileStorage';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Slider } from "@/components/ui/slider";
+import { orderService } from '@/services/supabaseService';
 
 type OrderFile = {
   name: string;
@@ -23,22 +24,23 @@ type OrderFile = {
 };
 
 type Order = {
-  orderId: string;
-  fullName: string;
-  phoneNumber: string;
-  printType: string;
+  id: string;
+  order_id: string;
+  full_name: string;
+  phone_number: string;
+  print_type: string;
   copies: number;
-  paperSize: string;
-  specialInstructions?: string;
+  paper_size: string;
+  special_instructions?: string;
   files: OrderFile[];
-  orderDate: string;
+  created_at: string;
   status: string;
-  totalCost: number;
-  printSide: string;
-  selectedPages?: string;
-  colorPages?: string;
-  bwPages?: string;
-  bindingColorType?: string;
+  total_cost: number;
+  print_side: string;
+  selected_pages?: string;
+  color_pages?: string;
+  bw_pages?: string;
+  binding_color_type?: string;
 };
 
 const OrdersList = () => {
@@ -46,30 +48,49 @@ const OrdersList = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [maxScrollPosition, setMaxScrollPosition] = useState(100);
   const ordersPerPage = 10;
 
   useEffect(() => {
-    const storedOrders = JSON.parse(localStorage.getItem('xeroxOrders') || '[]');
-    const processedOrders = storedOrders.map((order: Order) => {
-      const processedFiles = order.files.map(file => {
-        if (!file.path) {
-          file.path = `/uploads/${file.name}`;
-        }
-        return file;
-      });
-      
-      return {
-        ...order,
-        files: processedFiles,
-        status: order.status || 'pending'
-      };
-    });
-    
-    setOrders(processedOrders);
-    localStorage.setItem('xeroxOrders', JSON.stringify(processedOrders));
+    loadOrders();
   }, []);
+
+  const loadOrders = async () => {
+    try {
+      setLoading(true);
+      const fetchedOrders = await orderService.getAllOrders();
+      setOrders(fetchedOrders);
+    } catch (error) {
+      console.error('Error loading orders:', error);
+      toast.error('Failed to load orders');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStatusChange = async (orderId: string, newStatus: string) => {
+    try {
+      await orderService.updateOrderStatus(orderId, newStatus);
+      
+      // Update local state
+      const updatedOrders = orders.map(order => 
+        order.order_id === orderId ? { ...order, status: newStatus } : order
+      );
+      
+      setOrders(updatedOrders);
+      
+      if (selectedOrder?.order_id === orderId) {
+        setSelectedOrder({ ...selectedOrder, status: newStatus });
+      }
+
+      toast.success(`Order status updated to ${newStatus}`);
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      toast.error('Failed to update order status');
+    }
+  };
 
   // Handle scroll position updates
   const handleScrollPositionChange = (value: number[]) => {
@@ -106,21 +127,6 @@ const OrdersList = () => {
       }, 100);
     }
   }, [dialogOpen, selectedOrder]);
-
-  const handleStatusChange = (orderId: string, newStatus: string) => {
-    const updatedOrders = orders.map(order => 
-      order.orderId === orderId ? { ...order, status: newStatus } : order
-    );
-    
-    setOrders(updatedOrders);
-    localStorage.setItem('xeroxOrders', JSON.stringify(updatedOrders));
-    
-    if (selectedOrder?.orderId === orderId) {
-      setSelectedOrder({ ...selectedOrder, status: newStatus });
-    }
-
-    toast.success(`Order status updated to ${newStatus}`);
-  };
 
   const viewOrderDetails = (order: Order) => {
     setSelectedOrder(order);
@@ -245,6 +251,14 @@ const OrdersList = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-gray-500">Loading orders...</p>
+      </div>
+    );
+  }
+
   return (
     <div>
       {orders.length === 0 ? (
@@ -269,14 +283,14 @@ const OrdersList = () => {
               </TableHeader>
               <TableBody>
                 {currentOrders.map((order) => (
-                  <TableRow key={order.orderId}>
-                    <TableCell className="font-mono text-xs">{order.orderId}</TableCell>
-                    <TableCell>{order.fullName}</TableCell>
-                    <TableCell className="text-xs">{formatDate(order.orderDate)}</TableCell>
-                    <TableCell className="text-xs">{getPrintTypeName(order.printType)}</TableCell>
+                  <TableRow key={order.id}>
+                    <TableCell className="font-mono text-xs">{order.order_id}</TableCell>
+                    <TableCell>{order.full_name}</TableCell>
+                    <TableCell className="text-xs">{formatDate(order.created_at)}</TableCell>
+                    <TableCell className="text-xs">{getPrintTypeName(order.print_type)}</TableCell>
                     <TableCell>{order.copies || 'N/A'}</TableCell>
                     <TableCell className="text-xs">
-                      {order.printType === 'customPrint' ? 'Quote Required' : `₹${order.totalCost?.toFixed(2) || '0.00'}`}
+                      {order.print_type === 'customPrint' ? 'Quote Required' : `₹${order.total_cost?.toFixed(2) || '0.00'}`}
                     </TableCell>
                     <TableCell>{getStatusBadge(order.status)}</TableCell>
                     <TableCell>
@@ -360,9 +374,9 @@ const OrdersList = () => {
         {selectedOrder && (
           <DialogContent className="max-w-4xl h-[90vh] overflow-hidden flex flex-col">
             <DialogHeader className="flex-shrink-0">
-              <DialogTitle className="text-lg sm:text-xl">Order Details - {selectedOrder.orderId}</DialogTitle>
+              <DialogTitle className="text-lg sm:text-xl">Order Details - {selectedOrder.order_id}</DialogTitle>
               <DialogDescription className="text-sm">
-                Submitted on {formatDate(selectedOrder.orderDate)}
+                Submitted on {formatDate(selectedOrder.created_at)}
               </DialogDescription>
             </DialogHeader>
             
@@ -379,8 +393,8 @@ const OrdersList = () => {
                       <div>
                         <h3 className="font-medium text-gray-700 text-sm sm:text-base">Customer Information</h3>
                         <div className="mt-2 space-y-1 text-sm">
-                          <p><span className="font-medium">Name:</span> {selectedOrder.fullName}</p>
-                          <p><span className="font-medium">Phone:</span> {selectedOrder.phoneNumber}</p>
+                          <p><span className="font-medium">Name:</span> {selectedOrder.full_name}</p>
+                          <p><span className="font-medium">Phone:</span> {selectedOrder.phone_number}</p>
                         </div>
                       </div>
                       
@@ -391,7 +405,7 @@ const OrdersList = () => {
                             size="sm" 
                             variant={selectedOrder.status === 'pending' ? 'default' : 'outline'}
                             className={`text-xs ${selectedOrder.status === 'pending' ? 'bg-yellow-500 hover:bg-yellow-600' : ''}`}
-                            onClick={() => handleStatusChange(selectedOrder.orderId, 'pending')}
+                            onClick={() => handleStatusChange(selectedOrder.order_id, 'pending')}
                           >
                             Pending
                           </Button>
@@ -399,7 +413,7 @@ const OrdersList = () => {
                             size="sm" 
                             variant={selectedOrder.status === 'processing' ? 'default' : 'outline'}
                             className={`text-xs ${selectedOrder.status === 'processing' ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
-                            onClick={() => handleStatusChange(selectedOrder.orderId, 'processing')}
+                            onClick={() => handleStatusChange(selectedOrder.order_id, 'processing')}
                           >
                             Processing
                           </Button>
@@ -407,7 +421,7 @@ const OrdersList = () => {
                             size="sm" 
                             variant={selectedOrder.status === 'completed' ? 'default' : 'outline'}
                             className={`text-xs ${selectedOrder.status === 'completed' ? 'bg-green-500 hover:bg-green-600' : ''}`}
-                            onClick={() => handleStatusChange(selectedOrder.orderId, 'completed')}
+                            onClick={() => handleStatusChange(selectedOrder.order_id, 'completed')}
                           >
                             Completed
                           </Button>
@@ -415,7 +429,7 @@ const OrdersList = () => {
                             size="sm" 
                             variant={selectedOrder.status === 'cancelled' ? 'default' : 'outline'}
                             className={`text-xs ${selectedOrder.status === 'cancelled' ? 'bg-red-500 hover:bg-red-600' : ''}`}
-                            onClick={() => handleStatusChange(selectedOrder.orderId, 'cancelled')}
+                            onClick={() => handleStatusChange(selectedOrder.order_id, 'cancelled')}
                           >
                             Cancelled
                           </Button>
@@ -428,67 +442,67 @@ const OrdersList = () => {
                       <div className="mt-2 grid grid-cols-1 lg:grid-cols-2 gap-4">
                         <div>
                           <p className="text-xs sm:text-sm text-gray-500">Print Type</p>
-                          <p className="text-sm">{getPrintTypeName(selectedOrder.printType)}</p>
+                          <p className="text-sm">{getPrintTypeName(selectedOrder.print_type)}</p>
                           
                           {/* Show binding color type for binding orders */}
-                          {(selectedOrder.printType === 'softBinding' || selectedOrder.printType === 'spiralBinding') && selectedOrder.bindingColorType && (
+                          {(selectedOrder.print_type === 'softBinding' || selectedOrder.print_type === 'spiralBinding') && selectedOrder.binding_color_type && (
                             <>
                               <p className="mt-2 text-xs sm:text-sm text-gray-500">Binding Color Type</p>
-                              <p className="text-sm">{getBindingColorTypeName(selectedOrder.bindingColorType)}</p>
+                              <p className="text-sm">{getBindingColorTypeName(selectedOrder.binding_color_type)}</p>
                             </>
                           )}
                           
                           {/* Show custom print details */}
-                          {selectedOrder.printType === 'custom' && (
+                          {selectedOrder.print_type === 'custom' && (
                             <>
                               <p className="mt-2 text-xs sm:text-sm text-gray-500">Color Pages</p>
-                              <p className="text-sm">{selectedOrder.colorPages || 'None'}</p>
+                              <p className="text-sm">{selectedOrder.color_pages || 'None'}</p>
                               <p className="mt-2 text-xs sm:text-sm text-gray-500">B&W Pages</p>
-                              <p className="text-sm">{selectedOrder.bwPages || 'None'}</p>
+                              <p className="text-sm">{selectedOrder.bw_pages || 'None'}</p>
                             </>
                           )}
                           
                           {/* Show binding custom details */}
-                          {(selectedOrder.printType === 'softBinding' || selectedOrder.printType === 'spiralBinding') && selectedOrder.bindingColorType === 'custom' && (
+                          {(selectedOrder.print_type === 'softBinding' || selectedOrder.print_type === 'spiralBinding') && selectedOrder.binding_color_type === 'custom' && (
                             <>
                               <p className="mt-2 text-xs sm:text-sm text-gray-500">Color Pages (Binding)</p>
-                              <p className="text-sm">{selectedOrder.colorPages || 'None'}</p>
+                              <p className="text-sm">{selectedOrder.color_pages || 'None'}</p>
                               <p className="mt-2 text-xs sm:text-sm text-gray-500">B&W Pages (Binding)</p>
-                              <p className="text-sm">{selectedOrder.bwPages || 'None'}</p>
+                              <p className="text-sm">{selectedOrder.bw_pages || 'None'}</p>
                             </>
                           )}
                           
                           {/* Show selected pages for non-custom orders */}
-                          {selectedOrder.printType !== 'custom' && selectedOrder.printType !== 'customPrint' && selectedOrder.selectedPages && (
+                          {selectedOrder.print_type !== 'custom' && selectedOrder.print_type !== 'customPrint' && selectedOrder.selected_pages && (
                             <>
                               <p className="mt-2 text-xs sm:text-sm text-gray-500">Selected Pages</p>
-                              <p className="text-sm">{selectedOrder.selectedPages}</p>
+                              <p className="text-sm">{selectedOrder.selected_pages}</p>
                             </>
                           )}
                         </div>
                         <div>
-                          {selectedOrder.printType !== 'customPrint' && (
+                          {selectedOrder.print_type !== 'customPrint' && (
                             <>
                               <p className="text-xs sm:text-sm text-gray-500">Print Side</p>
-                              <p className="text-sm">{selectedOrder.printSide === 'double' ? 'Double Sided' : 'Single Sided'}</p>
+                              <p className="text-sm">{selectedOrder.print_side === 'double' ? 'Double Sided' : 'Single Sided'}</p>
                               <p className="mt-2 text-xs sm:text-sm text-gray-500">Paper Size</p>
-                              <p className="text-sm">{getPaperSizeName(selectedOrder.paperSize)}</p>
+                              <p className="text-sm">{getPaperSizeName(selectedOrder.paper_size)}</p>
                               <p className="mt-2 text-xs sm:text-sm text-gray-500">Copies</p>
                               <p className="text-sm">{selectedOrder.copies}</p>
                             </>
                           )}
                           <p className="mt-2 text-xs sm:text-sm text-gray-500">Total Cost</p>
                           <p className="font-semibold text-sm">
-                            {selectedOrder.printType === 'customPrint' ? 'Quote Required' : `₹${selectedOrder.totalCost?.toFixed(2) || '0.00'}`}
+                            {selectedOrder.print_type === 'customPrint' ? 'Quote Required' : `₹${selectedOrder.total_cost?.toFixed(2) || '0.00'}`}
                           </p>
                         </div>
                       </div>
                     </div>
                     
-                    {selectedOrder.specialInstructions && (
+                    {selectedOrder.special_instructions && (
                       <div className="border-t pt-4">
                         <h3 className="font-medium text-gray-700 text-sm sm:text-base">Special Instructions</h3>
-                        <p className="mt-2 text-gray-800 whitespace-pre-line text-sm">{selectedOrder.specialInstructions}</p>
+                        <p className="mt-2 text-gray-800 whitespace-pre-line text-sm">{selectedOrder.special_instructions}</p>
                       </div>
                     )}
                     

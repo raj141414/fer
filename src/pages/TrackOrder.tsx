@@ -5,24 +5,26 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Search, Package, Clock, CheckCircle, Phone, Mail, MapPin } from "lucide-react";
 import { toast } from "sonner";
+import { orderService } from '@/services/supabaseService';
 
 interface Order {
-  orderId: string;
-  fullName: string;
-  phoneNumber: string;
-  printType: string;
+  id: string;
+  order_id: string;
+  full_name: string;
+  phone_number: string;
+  print_type: string;
   copies: number;
-  paperSize: string;
-  specialInstructions?: string;
-  orderDate: string;
+  paper_size: string;
+  special_instructions?: string;
+  created_at: string;
   status: string;
   files: Array<{ name: string; size: number; type: string; path?: string }>;
-  totalCost: number;
-  printSide: string;
-  selectedPages?: string;
-  colorPages?: string;
-  bwPages?: string;
-  bindingColorType?: string;
+  total_cost: number;
+  print_side: string;
+  selected_pages?: string;
+  color_pages?: string;
+  bw_pages?: string;
+  binding_color_type?: string;
 }
 
 const TrackOrder = () => {
@@ -31,7 +33,7 @@ const TrackOrder = () => {
   const [loading, setLoading] = useState(false);
   const [notFound, setNotFound] = useState(false);
 
-  const handleTrackOrder = () => {
+  const handleTrackOrder = async () => {
     if (!orderId.trim()) {
       toast.error("Please enter an order ID");
       return;
@@ -41,25 +43,17 @@ const TrackOrder = () => {
     setNotFound(false);
     setOrder(null);
 
-    // Simulate loading delay
-    setTimeout(() => {
-      try {
-        const existingOrders = JSON.parse(localStorage.getItem('xeroxOrders') || '[]') as Order[];
-        const foundOrder = existingOrders.find(order => order.orderId === orderId.trim());
-        
-        if (foundOrder) {
-          setOrder(foundOrder);
-          toast.success("Order found!");
-        } else {
-          setNotFound(true);
-          toast.error("Order not found. Please check your order ID.");
-        }
-      } catch (error) {
-        console.error('Error searching for order:', error);
-        toast.error("Error searching for order");
-      }
+    try {
+      const foundOrder = await orderService.getOrderById(orderId.trim());
+      setOrder(foundOrder);
+      toast.success("Order found!");
+    } catch (error) {
+      console.error('Error searching for order:', error);
+      setNotFound(true);
+      toast.error("Order not found. Please check your order ID.");
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   const getStatusIcon = (status: string) => {
@@ -178,7 +172,7 @@ const TrackOrder = () => {
                     Order Status: {getStatusText(order.status)}
                   </CardTitle>
                   <CardDescription className="break-all">
-                    Order ID: {order.orderId}
+                    Order ID: {order.order_id}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -186,58 +180,58 @@ const TrackOrder = () => {
                     <div>
                       <h4 className="font-medium text-gray-900 mb-3">Customer Details</h4>
                       <div className="space-y-2 text-sm">
-                        <p><span className="font-medium">Name:</span> {order.fullName}</p>
-                        <p><span className="font-medium">Phone:</span> {order.phoneNumber}</p>
-                        <p><span className="font-medium">Order Date:</span> {new Date(order.orderDate).toLocaleDateString()}</p>
+                        <p><span className="font-medium">Name:</span> {order.full_name}</p>
+                        <p><span className="font-medium">Phone:</span> {order.phone_number}</p>
+                        <p><span className="font-medium">Order Date:</span> {new Date(order.created_at).toLocaleDateString()}</p>
                       </div>
                     </div>
                     <div>
                       <h4 className="font-medium text-gray-900 mb-3">Print Details</h4>
                       <div className="space-y-2 text-sm">
-                        <p><span className="font-medium">Print Type:</span> {getPrintTypeName(order.printType)}</p>
+                        <p><span className="font-medium">Print Type:</span> {getPrintTypeName(order.print_type)}</p>
                         
                         {/* Show binding color type for binding orders */}
-                        {(order.printType === 'softBinding' || order.printType === 'spiralBinding') && order.bindingColorType && (
-                          <p><span className="font-medium">Binding Color Type:</span> {getBindingColorTypeName(order.bindingColorType)}</p>
+                        {(order.print_type === 'softBinding' || order.print_type === 'spiralBinding') && order.binding_color_type && (
+                          <p><span className="font-medium">Binding Color Type:</span> {getBindingColorTypeName(order.binding_color_type)}</p>
                         )}
                         
                         {/* Only show these details for non-custom print orders */}
-                        {order.printType !== 'customPrint' && (
+                        {order.print_type !== 'customPrint' && (
                           <>
-                            <p><span className="font-medium">Print Side:</span> {order.printSide === 'double' ? 'Double Sided' : 'Single Sided'}</p>
+                            <p><span className="font-medium">Print Side:</span> {order.print_side === 'double' ? 'Double Sided' : 'Single Sided'}</p>
                             <p><span className="font-medium">Copies:</span> {order.copies}</p>
-                            <p><span className="font-medium">Paper Size:</span> {order.paperSize?.toUpperCase()}</p>
+                            <p><span className="font-medium">Paper Size:</span> {order.paper_size?.toUpperCase()}</p>
                           </>
                         )}
                         
                         <p><span className="font-medium">Total Cost:</span> {
-                          order.printType === 'customPrint' ? 'Quote Required' : `₹${order.totalCost?.toFixed(2) || '0.00'}`
+                          order.print_type === 'customPrint' ? 'Quote Required' : `₹${order.total_cost?.toFixed(2) || '0.00'}`
                         }</p>
                       </div>
                     </div>
                   </div>
                   
                   {/* Show page details for applicable order types */}
-                  {order.printType !== 'customPrint' && (
+                  {order.print_type !== 'customPrint' && (
                     <div className="mt-4 pt-4 border-t">
                       <h4 className="font-medium text-gray-900 mb-2">Page Details</h4>
                       <div className="text-sm text-gray-600">
-                        {order.printType === 'custom' || (order.bindingColorType === 'custom') ? (
+                        {order.print_type === 'custom' || (order.binding_color_type === 'custom') ? (
                           <>
-                            {order.colorPages && <p><span className="font-medium">Color Pages:</span> {order.colorPages}</p>}
-                            {order.bwPages && <p><span className="font-medium">B&W Pages:</span> {order.bwPages}</p>}
+                            {order.color_pages && <p><span className="font-medium">Color Pages:</span> {order.color_pages}</p>}
+                            {order.bw_pages && <p><span className="font-medium">B&W Pages:</span> {order.bw_pages}</p>}
                           </>
                         ) : (
-                          order.selectedPages && <p><span className="font-medium">Selected Pages:</span> {order.selectedPages}</p>
+                          order.selected_pages && <p><span className="font-medium">Selected Pages:</span> {order.selected_pages}</p>
                         )}
                       </div>
                     </div>
                   )}
                   
-                  {order.specialInstructions && (
+                  {order.special_instructions && (
                     <div className="mt-4 pt-4 border-t">
                       <h4 className="font-medium text-gray-900 mb-2">Special Instructions</h4>
-                      <p className="text-sm text-gray-600">{order.specialInstructions}</p>
+                      <p className="text-sm text-gray-600">{order.special_instructions}</p>
                     </div>
                   )}
                 </CardContent>
