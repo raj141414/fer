@@ -15,24 +15,20 @@ const Home = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const carouselImages = [
     {
-      url: "https://images.pexels.com/photos/6814537/pexels-photo-6814537.jpeg",
+      url: "https://envs.sh/X_m.jpg",
       alt: "Professional printing services"
     },
     {
-      url: "https://images.pexels.com/photos/6615076/pexels-photo-6615076.jpeg",
+      url: "https://envs.sh/X_a.jpg",
       alt: "Modern printing equipment"
     },
     {
-      url: "https://images.pexels.com/photos/5905500/pexels-photo-5905500.jpeg",
+      url: "https://envs.sh/X_g.jpg",
       alt: "Document printing"
     },
     {
-      url: "https://images.pexels.com/photos/6177645/pexels-photo-6177645.jpeg",
+      url: "https://envs.sh/X_f.jpg",
       alt: "Print shop services"
-    },
-    {
-      url: "https://images.pexels.com/photos/5905558/pexels-photo-5905558.jpeg",
-      alt: "Professional printing"
     }
   ];
 

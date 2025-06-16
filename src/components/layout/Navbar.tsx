@@ -25,6 +25,9 @@ const Navbar = () => {
             <Link to="/" className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-xerox-700 transition-colors">
               Home
             </Link>
+            <Link to="/about" className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-xerox-700 transition-colors">
+              About
+            </Link>
             <Link to="/order" className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-xerox-700 transition-colors">
               Place Order
             </Link>
@@ -58,6 +61,13 @@ const Navbar = () => {
               onClick={() => setMobileMenuOpen(false)}
             >
               Home
+            </Link>
+            <Link 
+              to="/about" 
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-xerox-700 hover:bg-gray-50 transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              About
             </Link>
             <Link 
               to="/order" 
